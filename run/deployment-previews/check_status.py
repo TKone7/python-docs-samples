@@ -227,7 +227,7 @@ def set(
     Set a status on a GitHub commit to a specific revision URL
     """
     service_obj = get_service(project_id, region, service)
-    revision_url = get_revision_url(service_obj, tag=make_tag(pull_request))
+    revision_url = get_revision_url(service_obj, tag=make_tag(commit_sha))
 
     ghtoken = github_token(project_id, ghtoken_secretname)
 
