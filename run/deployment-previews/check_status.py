@@ -28,11 +28,11 @@ from googleapiclient import discovery
 from googleapiclient.errors import HttpError
 
 # cloud run tags much be lowercase
-TAG_PREFIX = "pr-"
+TAG_PREFIX = "commit-"
 
 
-def make_tag(pr: str) -> str:
-    return f"{TAG_PREFIX}{pr}"
+def make_tag(sha: str) -> str:
+    return f"{TAG_PREFIX}{sha}"
 
 
 def get_pr(tag: str) -> int:
