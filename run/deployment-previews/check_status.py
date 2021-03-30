@@ -29,14 +29,14 @@ from googleapiclient.errors import HttpError
 
 # cloud run tags much be lowercase
 TAG_PREFIX = "commit-"
-
+PR_PREFIX = "pr-"
 
 def make_tag(sha: str) -> str:
     return f"{TAG_PREFIX}{sha}"
 
 
 def get_pr(tag: str) -> int:
-    return int(tag.replace(TAG_PREFIX, ""))
+    return int(tag.replace(PR_PREFIX, ""))
 
 
 _default_options = [
@@ -165,17 +165,18 @@ def cleanup(dry_run: str, project_id: str, region: str, service: str, repo_name:
     tags_to_delete = []
 
     for rev in revs:
-        tag = rev["tag"]
-        pr = get_pr(tag)
-        pull_request = repo.get_pull(pr)
-        if pull_request.state == "closed":
-            if dry_run:
-                click.secho("Dry-run: ", fg="blue", bold=True, nl=False)
-                click.echo(
-                    f"PR {pr} is closed, so would remove tag {tag} on service {service}"
-                )
-            else:
-                tags_to_delete.append(tag)
+        if rev["tag"].startswith(PR_PREFIX):
+            tag = rev["tag"]
+            pr = get_pr(tag)
+            pull_request = repo.get_pull(pr)
+            if pull_request.state == "closed":
+                if dry_run:
+                    click.secho("Dry-run: ", fg="blue", bold=True, nl=False)
+                    click.echo(
+                        f"PR {pr} is closed, so would remove tag {tag} on service {service}"
+                    )
+                else:
+                    tags_to_delete.append(tag)
 
     if tags_to_delete:
         tags = ",".join(tags_to_delete)
